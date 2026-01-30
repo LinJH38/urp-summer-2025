@@ -5,77 +5,116 @@
 
 ## 1. 논문 기본 정보
 
-- **제목**: [논문의 정확한 제목 기재]
-- **저자**: [모든 저자 이름 기재]
-- **학회/저널**: [발행 학회 또는 저널명]
-- **년도**: [출판 연도]
-- **DOI/URL**: [DOI 또는 논문 URL]
-- **키워드**: [주요 키워드 5-6개]
+- **제목**: Attention Is All You Need
+- **저자**: Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin
+- **학회/저널**: Neural Information Processing Systems (NeurIPS)
+- **년도**: 2017
+- **DOI/URL**: https://arxiv.org/abs/1706.03762
+- **키워드**: Transformer,Multi-Head Attention, Scaled Dot-Product Attention, Positional Encoding, Adam optimizer
 
 ## 2. 논문 요약
 
 ### 2.1 연구 목적 및 문제 정의
-- [연구의 주요 목적을 개조식으로 작성]
-- [해결하고자 하는 문제 명확히 기술]
-- [연구의 중요성과 필요성 간략히 설명]
-- [기존 접근법의 한계점 작성]
-
+- Self-attention만 사용하여, Transduction model 생성
+- 기존 모델의 문제:
+  ○ Distance Dependeny문제: 기존 모델은 거리가 증가함에 따라, 연산량이 선형 혹은 로그함수에 비례하여 증가
+  ○ Paralleization 문제: Recurrent models은 이전 states에 연산이 끝나야, 현재 sequnce t에 대한 연산 가능
+- 연구의 필요성
+  ○ Sequence 길이와 무관하게 정확한 예측 필요
+  ○ Paralleization 연산으로 시간 단축
+중요성, 필요성
 ### 2.2 주요 접근 방법
-- [제안하는 핵심 방법론 개조식으로 작성]
-- [핵심 아이디어와 기술적 접근 방식 기술]
-- [주요 구성 요소 나열]
-  * [첫 번째 구성 요소와 특징]
-  * [두 번째 구성 요소와 특징]
-  * [필요시 추가 구성 요소 나열]
+- Multi-Head attention을 활용한 Paralleization 연산 구조의 Architecture 제안 
+- 주요 구성 요소:
+  ○ Encoder: Multi-Head Attention layer와 FF layer로 구성, Output을 Decoder의 중간 layer의 input으로 삽입
+  ○ Decoder: Masked Multi-Head Attention layer와 기존 Multi-Head attention layer, FF layer로 구성
+  ○ Multi-Head Attention: 다른 위치의 다른 표현 공간에서 다양한 정보를 Attention
+  ○ Position-wise Feed-Forward Networks: 비선형성으로 복잡한 추론 가능
+  ○ Positional Encoding: sin함수를 이용하여 input의 order를 나타냄
+  ○ Embedding: 문자(input)을 숫자(index)로 변환
+  ○ Softmax: 다음 올 단어(output)을 예측
 
 ### 2.3 주요 결과
-- [가장 중요한 실험 결과 개조식으로 작성]
-- [성능 지표와 수치 기술]
-- [기존 방법과의 비교 결과 요약]
-- [연구의 주요 발견점 나열]
+- WMT 2014 English-to-German translation task에서 BLEU 최고점수(EN-DE:28.4, EN-FR:41.8)달성
+- EN-DE에서 기존 방법(ConvS2S Ensemble)보다 2.04 더 높은 점수, EN-FR에서 0.49 더 높은 점수
+- 성능은 높힌채로, Training Cost는 0.25배 감소
+- Translation task가 아닌 Constituency Parsing에서 기존 방법보다 좋은 성능 보임
 
 ## 3. 방법론 분석
 
 ### 3.1 제안 방법 상세 설명
-- [방법론의 전체 구조 개조식으로 기술]
-- [주요 컴포넌트별 설명]
-  * [첫 번째 컴포넌트 설명]
-    > [상세 특징 및 동작 원리]
-    > [구현 방식 및 특징]
-  * [두 번째 컴포넌트 설명]
-    > [상세 특징 및 동작 원리]
-- [전체 파이프라인 또는 워크플로우 설명]
+-Transformer 아키텍쳐 구성:
+  ○ Embedding, Positional Encoding: 1개의 층으로 구성
+    ■ 문자로 들어 온 Source sequence를 Preprocessing을 통해 구현 한 단어 사전(vector)에 맞춰 index 부여
+    ■ input dimension을 512로 변경
+    ■ Order 정보를 기억하기 위해, sin 함수를 이용하여 [-1,1] 사이의 서로 다른 값을 더함
+  ○ Encoder: 6개의 동일한 층으로 구성
+    ■ Multi-Head Attention layer를 통해 기존 input의 고차원적인 결합 형태 가져옴
+    ■ 각 layer마다 residual(backpropagation에서 vanising gradient를 막기 위함)과 layer normalization(training과정에서, previous layer의 weight가 달라지면 해당 layer output의 mean과 variance도 달라지므로 next layer에서 iteration마다 의도와 다르게 학습함. 따라서 layer normalization을 통해 layer의 input의 distribution을 비교적 동일하게 유지함으로써 학습 안정성을 높힘) 활용
+    ■ Feed Forward layer를 통해 vector의 각 element 사이 의미 학습
+    ■ Output을 동일한 층 decoder내부 Multi-Head Attention의 key와 value에 대한 input vector로 삽입  
+  ○ Decoder: 6개의 동일한 층으로 구성
+    ■ 첫번째 Multi-Head Attension layer에서 Mask 기법 사용(cheating 방지)
+    ■ Encoder의 sub-layer 구조와 Multi-Head Attension layer 추가(총 3개의 layer로 구성)
+  ○ Linear transformation, Soft max: 1개의 층으로 구성
+    ■ 마지막 층에서 나온 decoder의 output(512 dimension vector)을 단어 사전 크기에 알맞은 dimension vector로 변환
+    ■ 변환된 Vector의 각 elements에 Softmax function을 사용하여 단어 사전의 각 token에 대한 probabillity로 변환
 
 ### 3.2 핵심 알고리즘/모델
-- [핵심 알고리즘 개조식으로 설명]
-- [주요 수식 및 각 변수의 의미 기술]
-  * [수식 1과 설명]
-  * [수식 2와 설명]
-- [알고리즘의 주요 단계 나열]
-  * [단계 1과 설명]
-  * [단계 2와 설명]
-- [알고리즘의 계산 복잡도 분석]
+- Scaled Dot-Product Attention
+  ○ 수식: Attention(Q, K, V ) = softmax(QK^T/√d_k)V
+    ■ Q(쿼리): 찾고자 하는 정보
+    ■ K(키): 참조할 정보의 색인
+    ■ V(값): 실제 추출할 정보
+    ■ d_k: 키 벡터의 차원
+  ○ 기존 self-attention 식에 √d_k를 나눠 key vector의 차원 증가에 따른 vanising gradient(x값이 클 때, softmax(x)의 기울기)현상을 방지함 
+
+- Multi-Head Attention
+  ○ 수식: MultiHead(Q, K, V ) = Concat(head_1, ..., head_h)W^O
+    ■ head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)
+    ■ W(weight matirx): 각 변수에 사용되는 parameters matirx
+  ○ Multi-Head 방식으로 각 head가 주목하는 정보가 서로 다름
+  ○ 각 head를 concatinate하여 하나의 vector로 변환
+  ○ Linear projection을 통해 각 head가 지닌 정보를 조합하여 512 dimension으로 변환(축소)
+
+- Position-wise Feed-Forward Networks
+  ○ 수식: FFN(x) = max(0, xW_1 + b_1)W_2 + b_2
+  ○ Non-linearity 성질을 추가하여, 복잡한 구조를 학습할 수 있도록
+  ○ 각 위치별로 독립적이고 동일하게 적용
+
+- Positional Encoding
+  ○ 수식:
+    ■ PE_(pos,2i) = sin(pos/10000^(2i/d_model))
+    ■ PE_(pos,2i+1) = cos(pos/10000^(2i/d_model))
+  ○ sin 함수를 이용하여 input의 order를 나타냄(새로운 방식)
 
 ### 3.3 실험 설계
-- [실험 환경 및 설정 개조식으로 기술]
-- [사용된 데이터셋]
-  * [데이터셋 1의 특성 및 크기]
-  * [데이터셋 2의 특성 및 크기]
-- [평가 지표 및 방법론]
-  * [지표 1과 설명]
-  * [지표 2와 설명]
-- [비교 대상 기준(baseline) 모델]
-- [구현 세부사항 및 하이퍼파라미터 설정]
+- 데이터셋
+  ○ WMT 2014 English-German dataset (4.5M sentence pairs)
+  ○ WMT 2014 English-French dataset (36M sentence pairs)
+
+- 모델 구성
+  ○ 층수: 6
+  ○ Modle dimension: 512
+  ○ Fead Foward layer dimension: 2048
+  ○ head수: 8
+
+- 최적화 방법
+  ○ Adam optimizer 사용: momentum과 Adaptive learning rate 활용
+  ○ Warmup step 사용: linear하게 learning rate를 증가시키고, warmup step(4000)이후 decay
+  ○ Residual connection 사용
+  ○ Drop out 사용: P_drop = 0.1, overfitting 방지 및 ensemble 효과
+  ○ Label smoothing 사용: Overfitiing 방지
 
 ## 4. 주요 결과 분석
 
 ### 4.1 정량적 결과
-- [주요 성능 지표 및 결과 개조식으로 작성]
-- [표나 그래프에 나타난 수치 데이터 요약]
-  * [결과 1의 수치와 의미]
-  * [결과 2의 수치와 의미]
-- [기존 방법과의 비교 결과]
-- [통계적 유의성 분석 결과]
+- Machine Translation
+  ○ WMT 2014 English-to-German translation: BLEU(28.4)
+  ○ WMT 2014 English-to-French0 translation: BLEU(41.8)
+  ○ 기존 모델보다 각 2.04, 0.49 더 높은 점수
+- Training Cost
+  ○ 기존 모델보다 0.25배 감소
 
 ### 4.2 정성적 결과
 - [수치화되지 않은 결과 개조식으로 작성]
