@@ -50,7 +50,9 @@
     ■ Order 정보를 기억하기 위해, sin 함수를 이용하여 [-1,1] 사이의 서로 다른 값을 더함
   ○ Encoder: 6개의 동일한 층으로 구성
     ■ Multi-Head Attention layer를 통해 기존 input의 고차원적인 결합 형태 가져옴
-    ■ 각 layer마다 residual(backpropagation에서 vanising gradient를 막기 위함)과 layer normalization(training과정에서, previous layer의 weight가 달라지면 해당 layer output의 mean과 variance도 달라지므로 next layer에서 iteration마다 의도와 다르게 학습함. 따라서 layer normalization을 통해 layer의 input의 distribution을 비교적 동일하게 유지함으로써 학습 안정성을 높힘) 활용
+    ■ 각 layer마다 residual(backpropagation에서 vanising gradient를 막기 위함)과 layer normalization(training과정에서
+      previous layer의 weight가 달라지면 해당 layer output의 mean과 variance도 달라지므로 next layer에서 iteration마다 의도와 다르게 학습함
+      따라서 layer normalization을 통해 layer의 input의 distribution을 비교적 동일하게 유지함으로써 학습 안정성을 높힘) 활용
     ■ Feed Forward layer를 통해 vector의 각 element 사이 의미 학습
     ■ Output을 동일한 층 decoder내부 Multi-Head Attention의 key와 value에 대한 input vector로 삽입  
   ○ Decoder: 6개의 동일한 층으로 구성
@@ -113,40 +115,47 @@
   ○ WMT 2014 English-to-German translation: BLEU(28.4)
   ○ WMT 2014 English-to-French0 translation: BLEU(41.8)
   ○ 기존 모델보다 각 2.04, 0.49 더 높은 점수
+
 - Training Cost
   ○ 기존 모델보다 0.25배 감소
 
 ### 4.2 정성적 결과
-- [수치화되지 않은 결과 개조식으로 작성]
-- [사례 연구 및 관찰 결과]
-- [시각화 결과 분석]
-- [모델 행동 특성 및 패턴 분석]
+
+- Attention Visualizations
+  ○ 하나의 단어와 각 head가 주목하는 단어 사이 관계 표현
+
+- 장거리 의존성 처리
+  ○ 문장 내 멀리 떨어진 요소 간 관계 파악 능력 향상
+
+- Single-Head 문제 해결
+  ○ Multi-Head 방식을 통해 특정 관점에 특화된 head 정보 획득
+  ○ 각 head를 조합하여 더 정확하게 예측
 
 ### 4.3 비교 분석
-- [제안 방법과 기존 방법 간 비교 개조식으로 작성]
-- [성능 측면의 비교]
-  * [장점 1과 설명]
-  * [장점 2와 설명]
-- [효율성 측면의 비교]
-- [적용 범위 및 한계의 비교]
+- 장거리 의존성 처리
+  ○ 문장 내 멀리 떨어진 요소 간 관계 파악 능력 향상
+- Single-Head 문제 해결
+  ○ Multi-Head 방식을 통해 특정 관점에 특화된 head 정보 획득
+  ○ 각 head를 조합하여 더 정확하게 예측
 
 ## 5. 비판적 평가
 
 ### 5.1 강점
-- [논문의 주요 강점 개조식으로 작성]
-- [기술적 혁신 측면]
-  * [혁신 1과 설명]
-  * [혁신 2와 설명]
-- [성능 향상 측면]
-- [이론적 기여 측면]
+- Transformer 구조 사용
+  ○ Paralleization 연산
+- Computaion complexity 감소
+- Translation 정확도 향상
+- 다른 sequence to sequence task 확장 가능
 
-### 5.2 한계점
+### 5.2 한계점 [아직 안 보임]
 - [논문의 주요 한계점 개조식으로 작성]
 - [방법론적 한계]
   * [한계 1과 설명]
   * [한계 2와 설명]
 - [실험적 한계]
 - [가정 및 제약사항]
+- 계산 복잡성
+  ○ Sequence length의 제곱에 비례
 
 ### 5.3 개선 가능성
 - [논문의 개선 가능성 개조식으로 작성]
@@ -165,6 +174,14 @@
   * [영향 2와 설명]
 - [방법론적 연관성]
 - [동일 문제에 대한 다른 접근법들]
+- Self-Attention 기법 활용
+  ○ Bahdanau et al.(2014)의 어텐션 개념 확장 및 개선
+- 방법론적 연관성
+  ○ Layer Normalization
+  ○ Dropout
+  ○ Residual Connection
+  ○ Adam Optimization
+  ○ Byte Pair Encoding
 
 ### 6.2 차별점
 - [선행 연구와의 차별점 개조식으로 작성]
@@ -254,8 +271,8 @@
 
 ---
 
-**작성자**: [이름]  
-**작성일**: YYYY-MM-DD  
+**작성자**: 임재현
+**작성일**: 2025-01-30  
 **토론 사항**: 
 - [내용1]
 - [내용2]
