@@ -17,14 +17,14 @@
 ### 2.1 연구 목적 및 문제 정의
 - Self-attention만 사용하여, Transduction model 생성
 - 기존 모델의 문제:
-  ○ Distance Dependeny문제: 기존 모델은 거리가 증가함에 따라, 연산량이 선형 혹은 로그함수에 비례하여 증가
-  ○ Paralleization 문제: Recurrent models은 이전 states에 연산이 끝나야, 현재 sequnce t에 대한 연산 가능
+  ○ Dependency 문제: 기존 모델은 거리가 증가함에 따라, 연산량이 선형 혹은 로그함수에 비례하여 증가
+  ○ Parallelization 문제: Sequential computation으로 인한 병렬 처리 불가
 - 연구의 필요성
   ○ Sequence 길이와 무관하게 정확한 예측 필요
-  ○ Paralleization 연산으로 시간 단축
+  ○ Parallelization 연산으로 시간 단축
 중요성, 필요성
 ### 2.2 주요 접근 방법
-- Multi-Head attention을 활용한 Paralleization 연산 구조의 Architecture 제안 
+- Multi-Head attention을 활용한 Parallelization 연산 구조의 Architecture 제안 
 - 주요 구성 요소:
   ○ Encoder: Multi-Head Attention layer와 FF layer로 구성, Output을 Decoder의 중간 layer의 input으로 삽입
   ○ Decoder: Masked Multi-Head Attention layer와 기존 Multi-Head attention layer, FF layer로 구성
@@ -46,21 +46,21 @@
 -Transformer 아키텍쳐 구성:
   ○ Embedding, Positional Encoding: 1개의 층으로 구성
     ■ 문자로 들어 온 Source sequence를 Preprocessing을 통해 구현 한 단어 사전(vector)에 맞춰 index 부여
-    ■ input dimension을 512로 변경
+    ■ Embedding vector의 차원 512와 동일한 차원을 가짐
     ■ Order 정보를 기억하기 위해, sin 함수를 이용하여 [-1,1] 사이의 서로 다른 값을 더함
   ○ Encoder: 6개의 동일한 층으로 구성
     ■ Multi-Head Attention layer를 통해 기존 input의 고차원적인 결합 형태 가져옴
-    ■ 각 layer마다 residual(backpropagation에서 vanising gradient를 막기 위함)과 layer normalization(training과정에서
+    ■ 각 layer마다 residual(backpropagation에서 vanishing gradient를 막기 위함)과 layer normalization(training과정에서
       previous layer의 weight가 달라지면 해당 layer output의 mean과 variance도 달라지므로 next layer에서 iteration마다 의도와 다르게 학습함
       따라서 layer normalization을 통해 layer의 input의 distribution을 비교적 동일하게 유지함으로써 학습 안정성을 높힘) 활용
     ■ Feed Forward layer를 통해 vector의 각 element 사이 의미 학습
     ■ Output을 동일한 층 decoder내부 Multi-Head Attention의 key와 value에 대한 input vector로 삽입  
   ○ Decoder: 6개의 동일한 층으로 구성
-    ■ 첫번째 Multi-Head Attension layer에서 Mask 기법 사용(cheating 방지)
-    ■ Encoder의 sub-layer 구조와 Multi-Head Attension layer 추가(총 3개의 layer로 구성)
-  ○ Linear transformation, Soft max: 1개의 층으로 구성
+    ■ 첫번째 Multi-Head Attention layer에서 Mask 기법 사용(Auto-regressive 속성을 유지하기 위해 미래 시점의 단어를 참조하지 못하도록 마스킹)
+    ■ Encoder의 sub-layer 구조와 Multi-Head Attention layer 추가(총 3개의 layer로 구성)
+  ○ Linear transformation, Softmax: 1개의 층으로 구성
     ■ 마지막 층에서 나온 decoder의 output(512 dimension vector)을 단어 사전 크기에 알맞은 dimension vector로 변환
-    ■ 변환된 Vector의 각 elements에 Softmax function을 사용하여 단어 사전의 각 token에 대한 probabillity로 변환
+    ■ 변환된 Vector의 각 elements에 Softmax function을 사용하여 단어 사전의 각 token에 대한 probability로 변환
 
 ### 3.2 핵심 알고리즘/모델
 - Scaled Dot-Product Attention
@@ -69,14 +69,14 @@
     ■ K(키): 참조할 정보의 색인
     ■ V(값): 실제 추출할 정보
     ■ d_k: 키 벡터의 차원
-  ○ 기존 self-attention 식에 √d_k를 나눠 key vector의 차원 증가에 따른 vanising gradient(x값이 클 때, softmax(x)의 기울기)현상을 방지함 
+  ○ 기존 self-attention 식에 √d_k를 나눠 key vector의 차원 증가에 따른 vanishing gradient(x값이 클 때, softmax(x)의 기울기)현상을 방지함 
 
 - Multi-Head Attention
   ○ 수식: MultiHead(Q, K, V ) = Concat(head_1, ..., head_h)W^O
     ■ head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)
-    ■ W(weight matirx): 각 변수에 사용되는 parameters matirx
+    ■ W(weight matrix): 각 변수에 사용되는 parameters matrix
   ○ Multi-Head 방식으로 각 head가 주목하는 정보가 서로 다름
-  ○ 각 head를 concatinate하여 하나의 vector로 변환
+  ○ 각 head를 concatenate하여 하나의 vector로 변환
   ○ Linear projection을 통해 각 head가 지닌 정보를 조합하여 512 dimension으로 변환(축소)
 
 - Position-wise Feed-Forward Networks
@@ -97,8 +97,8 @@
 
 - 모델 구성
   ○ 층수: 6
-  ○ Modle dimension: 512
-  ○ Fead Foward layer dimension: 2048
+  ○ Model dimension: 512
+  ○ Fead Forward layer dimension: 2048
   ○ head수: 8
 
 - 최적화 방법
@@ -106,14 +106,14 @@
   ○ Warmup step 사용: linear하게 learning rate를 증가시키고, warmup step(4000)이후 decay
   ○ Residual connection 사용
   ○ Drop out 사용: P_drop = 0.1, overfitting 방지 및 ensemble 효과
-  ○ Label smoothing 사용: Overfitiing 방지
+  ○ Label smoothing 사용: Overfitting 방지
 
 ## 4. 주요 결과 분석
 
 ### 4.1 정량적 결과
 - Machine Translation
   ○ WMT 2014 English-to-German translation: BLEU(28.4)
-  ○ WMT 2014 English-to-French0 translation: BLEU(41.8)
+  ○ WMT 2014 English-to-French translation: BLEU(41.8)
   ○ 기존 모델보다 각 2.04, 0.49 더 높은 점수
 
 - Training Cost
@@ -142,8 +142,8 @@
 
 ### 5.1 강점
 - Transformer 구조 사용
-  ○ Paralleization 연산
-- Computaion complexity 감소
+  ○ Parallelization 연산
+- Computation complexity 감소
 - Translation 정확도 향상
 - 다른 sequence to sequence task 확장 가능
 
@@ -219,15 +219,25 @@
 
 ## 8. 참고 문헌
 
-- [논문 리뷰 작성 중 추가로 참고한 문헌들 나열]
-- [형식: 저자. (연도). 제목. 출처.]
+1. Vaswani, A., et al. (2017). Attention Is All You Need. Advances in Neural Information Processing Systems (NeurIPS).
+2. Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural Machine Translation by Jointly Learning to Align and Translate. ICLR. (Attention 메커니즘의 시초)
+3. Kingma, D. P., & Ba, J. (2015). Adam: A Method for Stochastic Optimization. ICLR. (사용된 최적화 기법)
+4. Ba, J. L., Kiros, J. R., & Hinton, G. E. (2016). Layer Normalization. arXiv preprint arXiv:1607.06450. (사용된 정규화 기법)
+5. He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep Residual Learning for Image Recognition. CVPR. (Residual Connection의 기원)
 
 ## 9. 용어 정리
 
-- **[약어 1]** ([원래 단어]: [간략한 정의])
-- **[약어 2]** ([원래 단어]: [간략한 정의])
-- **[용어 1]**: [정의 및 설명]
-- **[용어 2]**: [정의 및 설명]
+-BPE (Byte Pair Encoding): 데이터를 압축하는 알고리즘 중 하나로, 빈도수가 높은 문자 쌍을 하나의 문자로 치환하여 단어 사전을 구축하는 토큰화(Tokenization) 방식.
+ 본 논문에서 서브워드(Subword) 분리를 위해 사용됨
+
+-BLEU (Bilingual Evaluation Understudy): 기계 번역의 성능을 측정하는 대표적인 평가지표.
+ 모델이 번역한 문장이 사람이 번역한 문장(Reference)과 얼마나 유사한지를 n-gram 일치도를 통해 점수화(0~100)한 것.
+
+-Residual Connection (잔차 연결): $F(x) + x$ 와 같이 레이어의 입력을 출력에 그대로 더해주는 구조.
+ 깊은 신경망에서 기울기 소실(Vanishing Gradient) 문제를 해결하여 학습을 도움.
+
+-Layer Normalization: 각 샘플(Layer) 내에서 특징(Feature)들의 평균과 분산을 구하여 정규화하는 방식.
+학습 속도를 높이고 안정화하는 데 기여함.
 
 ## 10. 추가 참고 사항
 
