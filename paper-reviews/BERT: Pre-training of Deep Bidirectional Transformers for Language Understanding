@@ -11,7 +11,7 @@
 - **학회/저널**: Association for Computational Linguistics
 - **년도**: 2019
 - **DOI/URL**: https://arxiv.org/abs/1810.04805
-- **키워드**: BERT, Deep bidirectional representations, Pre-Trainig, Fine-Tuning
+- **키워드**: BERT, Deep bidirectional representations, Pre-Training, Fine-Tuning
 
 ## 2. 논문 요약
 
@@ -31,11 +31,11 @@
   ○ Contextual representation tokens
 
 ### 2.3 주요 결과
-- GLUE(General Language Understanding Evaluation) 벤치마크에서 점수 79.6점 달성
+- GLUE(General Language Understanding Evaluation) 벤치마크에서 점수 79.6점 달성(Base 모델)
   ○ 기존 최고 성능보다 4.5% 정확도 향상
-- SQuAD v1.1(Stanford Question Answering Dataset v1.1)에서 Large 모델 점수 93.2점 달성
+- SQuAD v1.1(Stanford Question Answering Dataset v1.1)에서 93.2점 달성(Large 모델 Ensemble)
   ○ 인간보다 높은 점수 달성
-- SWAG(Situations With Adversarial Generations)에서 점수 81.6점 달성
+- SWAG(Situations With Adversarial Generations)에서 점수 81.6점 달성(Base 모델)
   ○ 기존 최고 성능보다 3.6점 향상
 - 모델 파라미터가 기존 모델의 포화(saturation) 지점보다 늘어나도 포화되지 않음
 
@@ -48,18 +48,18 @@
    ■ Embedding은 Token embedding, Segment embedding, Position embedding의 순서로 이루어짐
    ■ 마지막 hidden 층에서 CLS token과 문장에 대한 Contextual representation token 출력
    ■ 이를 기반으로 MLM, NSP 테스크 수행
- ○ Fine-Tuning: 13개의 층, 테스크 별로 13번째 층의 구조가 달라짐
+ ○ Fine-Tuning: 12개의 Transformer 층 + Task-Specific output 층, 테스크 별로 13번째 층의 구조가 달라짐
    ■ Pre-training 모델 구조에 특정 테스크에 대한 output 층을 추가
    ■ Pre-training에서 학습된 파라미터를 초기화된 파라미터로 사용하고 테스크에 맞춘 추가 학습 진행
 
 ### 3.2 핵심 알고리즘/모델
 - WordPiece Embedding
-  ○ 수식: likelihood=count(AB)/(count(A)+count(B))
-    ■ A: B와 붙어있는 특정 문자
-    ■ B: A와 붙어있는 특정 문자
-  ○ 우도를 계산하여 사전에 추가함으로써 기존 BPE(BytePair Embedding)보다 문자 간 연관성을 잘 반영함
+  ○ 수식: Score=freq(pair)/(freq(first)+freq(second))
+    ■ first: second와 붙어있는 특정 문자
+    ■ second: first와 붙어있는 특정 문자
+  ○ 빈도수 기반으로 우도를 최대화하여 사전에 추가함으로써 기존 BPE(BytePair Embedding)보다 문자 간 연관성을 잘 반영함
 
-- Unsupervised Maked LM
+- Unsupervised Masked LM
   ○ 시퀀스 내부 토큰의 15%를 마스킹함
   ○ 마스킹한 토큰 중 80%를 [MASK] 토큰으로 교체, 10%를 동일한 토큰으로 교체, 10%를 다른 토큰으로 교체
   ○ Bidirectional 인코더로 왼쪽과 오른쪽, 오른쪽과 왼쪽의 문맥을 고려하여 마스킹 단어 예측 
@@ -70,16 +70,6 @@
   ○ 마지막 층의 Classification 토큰을 통해 B가 A의 다음 문장인지 아닌지 예측
 
 ### 3.3 실험 설계
-- [실험 환경 및 설정 개조식으로 기술]
-- [사용된 데이터셋]
-  * [데이터셋 1의 특성 및 크기]
-  * [데이터셋 2의 특성 및 크기]
-- [평가 지표 및 방법론]
-  * [지표 1과 설명]
-  * [지표 2와 설명]
-- [비교 대상 기준(baseline) 모델]
-- [구현 세부사항 및 하이퍼파라미터 설정]
-- 최적화 방법:
 - 데이터셋:
   ○ Pre-training:
     ■ BooksCorpus (8억 단어), English Wikipedia (25억 단어)
@@ -89,7 +79,7 @@
 - 모델 구성:
   ○ Pre-training:
     ■ Batch Size: 256 sequences (256 * 512 tokens = 128,000 tokens/batch)
-    ■ Learning RAte(Adam): 1e-4
+    ■ Learning Rate(Adam): 1e-4
     ■ Epochs: 40 Epochs
   ○ Fine-tuning:
     ■ Batch Size: 16, 32 sequences
@@ -100,7 +90,7 @@
   ○ Warmup step 사용
   ○ Adam optimizer 사용
   ○ gelu 활성화 함수 사용
-  ○ dropuout 사용
+  ○ dropout 사용
 
 
 ## 4. 주요 결과 분석
@@ -205,16 +195,21 @@
 - [예상되는 결과 및 효과]
 
 ## 8. 참고 문헌
-
-- [논문 리뷰 작성 중 추가로 참고한 문헌들 나열]
-- [형식: 저자. (연도). 제목. 출처.]
+1. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. NeurIPS 2017.
+2. Radford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). Improving language understanding by generative pre-training. OpenAI.
+3. Peters, M. E., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., & Zettlemoyer, L. (2018). Deep contextualized word representations. NAACL-HLT 2018.
+4. Wang, A., Singh, A., Michael, J., Hill, F., Levy, O., & Bowman, S. R. (2018). GLUE: A multi-task benchmark and analysis platform for natural language understanding. EMNLP 2018.
+5. Rajpurkar, P., Zhang, J., Lopyrev, K., & Liang, P. (2016). SQuAD: 100,000+ questions for machine comprehension of text. EMNLP 2016.
+6. Zellers, R., Bisk, Y., Schwartz, R., & Choi, Y. (2018). SWAG: A large-scale adversarial dataset for grounded commonsense inference. EMNLP 2018.
 
 ## 9. 용어 정리
-
-- **[약어 1]** ([원래 단어]: [간략한 정의])
-- **[약어 2]** ([원래 단어]: [간략한 정의])
-- **[용어 1]**: [정의 및 설명]
-- **[용어 2]**: [정의 및 설명]
+- MLM (Masked Language Model): 입력 문장의 일부 단어를 가리고([MASK]), 문맥을 통해 해당 단어를 예측하도록 학습하는 기법.
+- NSP (Next Sentence Prediction): 두 문장이 주어졌을 때, 두 번째 문장이 첫 번째 문장의 바로 다음에 이어지는 문장인지 판별하는 학습 기법
+- GLUE (General Language Understanding Evaluation): 자연어 처리 모델의 범용적인 이해 능력을 평가하기 위한 9가지 태스크 모음 벤치마크
+- SQuAD (Stanford Question Answering Dataset): 위키피디아 기반의 기계 독해(MRC) 및 질의응답 데이터셋
+- BPE (Byte Pair Encoding): 빈도수 기반으로 문자를 병합하여 서브워드(Subword) 단위를 만드는 토큰화 알고리즘. (BERT는 이를 변형한 WordPiece 사용)
+- [CLS] (Classification Token): 입력 시퀀스의 맨 앞에 붙는 특수 토큰으로, 문장 전체의 의미(Classification 정보)를 담도록 학습됨
+- [SEP] (Separator Token): 두 개의 문장을 입력으로 받을 때, 문장 사이를 구분하거나 문장의 끝을 알리기 위해 사용하는 특수 토큰
 
 ## 10. 추가 참고 사항
 
