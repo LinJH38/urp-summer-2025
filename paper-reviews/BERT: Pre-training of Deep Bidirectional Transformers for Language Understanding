@@ -1,0 +1,265 @@
+[5,6,7] 수정 필요(02.01)
+# 논문 리뷰 템플릿 - 개조식 작성 가이드
+
+> 이 템플릿은 개조식으로 논문을 효과적으로 리뷰하기 위한 구조를 제공하며, 필요에 따라 구조와 내용을 삭제, 수정 및 추가하여 사용
+
+
+## 1. 논문 기본 정보
+
+- **제목**: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+- **저자**: Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova
+- **학회/저널**: Association for Computational Linguistics
+- **년도**: 2019
+- **DOI/URL**: https://arxiv.org/abs/1810.04805
+- **키워드**: BERT, Deep bidirectional representations, Pre-Trainig, Fine-Tuning
+
+## 2. 논문 요약
+
+### 2.1 연구 목적 및 문제 정의
+- Unidirectional Transformer 기반 fine-tuning 모델과 feature-based 기반 모델을 사용하지 않는 새로운 방법의 모델 제안
+- 기존 GPT 기반 모델의 문제점:
+  ○ 이전 토큰들만 어텐션 가능
+  ○ 문맥 파악 능력의 한계
+- Deep bidirectional Transformer기반 pre-training으로 단순하고 강력한 fine-tuning 모델 제안
+
+### 2.2 주요 접근 방법
+- Bidirectional 인코더 기반의 pre-training 모델 제안
+- 주요 구성 요소:
+  ○ 인코더(encoder)
+  ○ Input embedding
+  ○ Classification token
+  ○ Contextual representation tokens
+
+### 2.3 주요 결과
+- GLUE(General Language Understanding Evaluation) 벤치마크에서 점수 79.6점 달성
+  ○ 기존 최고 성능보다 4.5% 정확도 향상
+- SQuAD v1.1(Stanford Question Answering Dataset v1.1)에서 Large 모델 점수 93.2점 달성
+  ○ 인간보다 높은 점수 달성
+- SWAG(Situations With Adversarial Generations)에서 점수 81.6점 달성
+  ○ 기존 최고 성능보다 3.6점 향상
+- 모델 파라미터가 기존 모델의 포화(saturation) 지점보다 늘어나도 포화되지 않음
+
+## 3. 방법론 분석
+
+### 3.1 제안 방법 상세 설명
+-BERT 아키텍쳐 구성:
+ ○ Pre-training: 12개의 층, 768개의 hidden 사이즈, 12개의 헤드 수로 구성
+   ■ Input으로 레이블이 없는 문장을 하나의 시퀀스로 받음
+   ■ Embedding은 Token embedding, Segment embedding, Position embedding의 순서로 이루어짐
+   ■ 마지막 hidden 층에서 CLS token과 문장에 대한 Contextual representation token 출력
+   ■ 이를 기반으로 MLM, NSP 테스크 수행
+ ○ Fine-Tuning: 13개의 층, 테스크 별로 13번째 층의 구조가 달라짐
+   ■ Pre-training 모델 구조에 특정 테스크에 대한 output 층을 추가
+   ■ Pre-training에서 학습된 파라미터를 초기화된 파라미터로 사용하고 테스크에 맞춘 추가 학습 진행
+
+### 3.2 핵심 알고리즘/모델
+- WordPiece Embedding
+  ○ 수식: likelihood=count(AB)/(count(A)+count(B))
+    ■ A: B와 붙어있는 특정 문자
+    ■ B: A와 붙어있는 특정 문자
+  ○ 우도를 계산하여 사전에 추가함으로써 기존 BPE(BytePair Embedding)보다 문자 간 연관성을 잘 반영함
+
+- Unsupervised Maked LM
+  ○ 시퀀스 내부 토큰의 15%를 마스킹함
+  ○ 마스킹한 토큰 중 80%를 [MASK] 토큰으로 교체, 10%를 동일한 토큰으로 교체, 10%를 다른 토큰으로 교체
+  ○ Bidirectional 인코더로 왼쪽과 오른쪽, 오른쪽과 왼쪽의 문맥을 고려하여 마스킹 단어 예측 
+
+- Unsupervised NSP
+  ○ 문장 A와 B를 input에 삽입
+  ○ 문장 B는 50% 확률로 A의 다음 문장
+  ○ 마지막 층의 Classification 토큰을 통해 B가 A의 다음 문장인지 아닌지 예측
+
+### 3.3 실험 설계
+- [실험 환경 및 설정 개조식으로 기술]
+- [사용된 데이터셋]
+  * [데이터셋 1의 특성 및 크기]
+  * [데이터셋 2의 특성 및 크기]
+- [평가 지표 및 방법론]
+  * [지표 1과 설명]
+  * [지표 2와 설명]
+- [비교 대상 기준(baseline) 모델]
+- [구현 세부사항 및 하이퍼파라미터 설정]
+- 최적화 방법:
+- 데이터셋:
+  ○ Pre-training:
+    ■ BooksCorpus (8억 단어), English Wikipedia (25억 단어)
+  ○ Fine-tuning:
+    ■ GLUE Benchmark, SQuAD, SWAG
+
+- 모델 구성:
+  ○ Pre-training:
+    ■ Batch Size: 256 sequences (256 * 512 tokens = 128,000 tokens/batch)
+    ■ Learning RAte(Adam): 1e-4
+    ■ Epochs: 40 Epochs
+  ○ Fine-tuning:
+    ■ Batch Size: 16, 32 sequences
+    ■ Learning Rate (Adam): 5e-5, 3e-5, 2e-5
+    ■ Epochs: 2, 3, 4
+
+- 최적화 방법:
+  ○ Warmup step 사용
+  ○ Adam optimizer 사용
+  ○ gelu 활성화 함수 사용
+  ○ dropuout 사용
+
+
+## 4. 주요 결과 분석
+
+### 4.1 정량적 결과
+- NLP 테스크:
+  ○ GLUE: 79.6점(기존 최고 대비 +4.5)
+  ○ SQuAD v1.1: 88.5점
+  ○ SWAG: 81.6점(기존 최고 대비 +3.6)
+
+### 4.2 정성적 결과
+- [수치화되지 않은 결과 개조식으로 작성]
+- [사례 연구 및 관찰 결과]
+- [시각화 결과 분석]
+- Pre-training 시각화:
+  ○ 양방향 학습 관계 효과적 포착
+- 어텐션 범위 한계 해결:
+  ○ 마스킹 없는 양방향 학습으로 오른쪽 토큰도 예측에 활용
+  ○ 한정된 자원을 가진 테스크에서 기존 모델보다 효과적임을 입증
+
+### 4.3 비교 분석
+- 기존 모델과의 성능 비교:
+  ○ GPT 모델 대비 GLUE 점수 +4.5점
+  ○ ELMo 기반 모델 대비 GLUE 점수 + 8.6점
+-  Fine-Tuning 모델로 feature-based 기반인 ELMo 모델에 비해 파라미터가 작음
+- 적용 범위 한계:
+  ○ 인코더만 사용하므로, GPT에 비해 테스크 제한
+
+## 5. 비판적 평가
+
+### 5.1 강점
+- 아키텍쳐적 혁신:
+  ○ [SEP] 토큰 사용으로 구분되는 Sentence 활용
+  ○ 실제 매우 긴 문장을 하나의 Sentence로 넣을 수 있음
+  ○ 인코더만 사용하는 단순한 구조
+  ○ 양방향 학습으로 context 이해력 대폭 향상
+- 성능 향상:
+  ○ 제한된 자원 속 테스크에서도 비슷한 성능 유지
+  ○ Feature-based 모델을 사용해도 기존 모델보다 좋은 성능
+  ○ 토큰, 문장 수준 관계없이 모든 테스크에서 기존 모델보다 좋은 성능
+- 이론적 기여:
+  ○ Pre-training의 SOTA 모델
+  ○ Bidirectional encoder만을 활용한 학습 방법
+
+### 5.2 한계점
+- [논문의 주요 한계점 개조식으로 작성]
+- [방법론적 한계]
+  * [한계 1과 설명]
+  * [한계 2와 설명]
+- [실험적 한계]
+- [가정 및 제약사항]
+
+### 5.3 개선 가능성
+- [논문의 개선 가능성 개조식으로 작성]
+- [방법론 개선 방향]
+  * [개선 방향 1과 설명]
+  * [개선 방향 2와 설명]
+- [추가 실험 제안]
+- [새로운 응용 분야 제안]
+
+## 6. 관련 연구와의 관계
+
+### 6.1 선행 연구와의 연관성
+- 기존 Transformer 구조 활용:
+  ○ Vaswani et al.(2017)의 Transformer 인코더 구조 활용 및 발전
+- 동일 문제에 대한 다른 모델:
+  ○ Radford et al.(2018)의 Transformer의 디코더 구조 활용 및 발전
+    
+
+### 6.2 차별점
+- [선행 연구와의 차별점 개조식으로 작성]
+- [새로운 기술적 접근법]
+  * [차별점 1과 설명]
+  * [차별점 2와 설명]
+- [성능 개선 측면의 차별점]
+- [문제 정의 및 해결 방식의 차이점]
+
+## 7. AIoT 연구에의 적용 가능성
+
+### 7.1 연구실 주제와의 연관성
+- [우리 연구실의 AIoT 주제와의 연관성 개조식으로 작성]
+- [관련 연구 방향]
+  * [연구 방향 1과 설명]
+  * [연구 방향 2와 설명]
+- [기술적 활용 가능성]
+- [이론적 확장 가능성]
+
+### 7.2 잠재적 응용 분야
+- [논문 기술의 AIoT 응용 분야 개조식으로 작성]
+- [센서 데이터 분석 응용]
+  * [응용 1과 설명]
+  * [응용 2와 설명]
+- [에지 컴퓨팅 응용]
+- [스마트 시스템 응용]
+
+### 7.3 구현/적용 계획
+- [실제 구현 및 적용 계획 개조식으로 작성]
+- [단계별 구현 방법]
+  * [단계 1과 설명]
+  * [단계 2와 설명]
+- [필요한 자원 및 도구]
+- [예상되는 결과 및 효과]
+
+## 8. 참고 문헌
+
+- [논문 리뷰 작성 중 추가로 참고한 문헌들 나열]
+- [형식: 저자. (연도). 제목. 출처.]
+
+## 9. 용어 정리
+
+- **[약어 1]** ([원래 단어]: [간략한 정의])
+- **[약어 2]** ([원래 단어]: [간략한 정의])
+- **[용어 1]**: [정의 및 설명]
+- **[용어 2]**: [정의 및 설명]
+
+## 10. 추가 참고 사항
+
+- [논문 관련 코드 저장소]
+- [추가 자료 및 리소스]
+- [관련 토론 및 후속 연구]
+- [구현 시 참고할 사항]
+
+---
+
+**리뷰어**: [이름]  
+**리뷰 일자**: [YYYY-MM-DD]  
+**토론 사항**: [논문 토론 시 주요 논의점을 메모]
+
+# 개조식 논문 리뷰 작성 지침
+
+1. **간결성 유지**:
+   - 문장보다는 구(phrase) 중심으로 작성
+   - 핵심 정보만 포함하고 불필요한 설명 제외
+   - 중요한 내용은 굵은 글씨로 강조
+
+2. **계층적 구조 활용**:
+   - 글머리 기호(bullet points)로 정보 계층화
+   - 들여쓰기를 통해 상위-하위 관계 표현
+   - 관련 정보는 그룹화하여 제시
+
+3. **약어 표기법**:
+   - 모든 약어는 최초 등장 시 전체 단어와 간략한 정의 함께 제공
+   - 예: CNN(Convolutional Neural Network: 합성곱 신경망)
+   - 이후 등장 시에는 약어만 사용 가능
+
+4. **객관성 유지**:
+   - 사실과 논문의 주장을 명확히 구분
+   - 개인적 의견은 '비판적 평가' 섹션에 한정
+   - 논문의 내용을 왜곡하지 않도록 주의
+
+5. **참고 자료 활용**:
+   - 논문 이해에 도움이 되는 추가 자료 참조
+   - 관련 연구와의 연결점 탐색
+   - 코드 구현이 있는 경우 코드 분석 결과 포함
+
+---
+
+**작성자**: [이름]  
+**작성일**: YYYY-MM-DD  
+**토론 사항**: 
+- [내용1]
+- [내용2]
