@@ -10,7 +10,7 @@
 - **학회/저널**: International Conference on Learning Representations(ICLR)
 - **년도**: 2021
 - **DOI/URL**: https://arxiv.org/pdf/2010.11929
-- **키워드**: Computer Vison, Vision Transformer(ViT), Inductive bias, Muti-Head Attention, Patch Embedding
+- **키워드**: Computer Vision, Vision Transformer(ViT), Inductive bias, Multi-Head Attention, Patch Embedding
 
 ## 2. 논문 요약
 
@@ -22,7 +22,6 @@
   ○ Inductive bias로 인한 대량 데이터에서 성능 한계
 
 - 트랜스포머 구조(Multi-Head attention 기반 인코더 활용)를 활용한 이미지 인식 모델 제안
-
 
 ### 2.2 주요 접근 방법
 - 트랜스포머 구조를 활용한 이미지 인식 아키텍쳐 제안
@@ -56,7 +55,7 @@
     ■ 하나의 Multi-Head Attention layer와 Multi-Layer Perceptron(MLP)로 구성
   ○ MLP Head
     ■ 추가적인 class token의 인코더 output을 MLP Head의 input으로 삽입
-    ■ 활성화 함수가 tanh인 하나의 layer로 구성됨
+    ■ Pre-training 시에는 MLP(tanh 활성화 함수)를 사용하나, Fine-tuning 시에는 단일 Linear Layer를 사용
     ■ K dimension으로 변환하여 최종 class 예측
 
 ### 3.2 핵심 알고리즘/모델
@@ -117,21 +116,14 @@
 - 통계적 유의성
   ○ 만일 Pre-training dataset이 작다면, BiT가 더 좋은 성능을 가질 수 있음  
 
-### 4.2 정성적 결과]
-- CV 분야에서 attension 기법을 활용하여 medium-level의 resolution을 다룸
+### 4.2 정성적 결과
+- CV 분야에서 attention 기법을 활용하여 medium-level의 resolution을 다룸
 - Inductive bias 극복(saturation되지 않음, 초기 layer에서도 global information을 가짐)
 - Self-supervised ViT의 가능성 보임
 - 1D와 2D positional embedding간 차이가 크지 않음(계산 효율성을 위해 1D 사용)
-- Attention rollout으로 sementically relevant regions을 정확하게 학습함을 증명
-
+- Attention rollout으로 semantically relevant regions을 정확하게 학습함을 증명
 
 ### 4.3 비교 분석
-- [제안 방법과 기존 방법 간 비교 개조식으로 작성]
-- [성능 측면의 비교]
-  * [장점 1과 설명]
-  * [장점 2와 설명]
-- [효율성 측면의 비교]
-- [적용 범위 및 한계의 비교]
 - 기존 모델과의 성능 비교:
   ○ ImageNet, VTAB benchmark에서 ViT기반 모델이 BiT(기존 SOTA)모델보다 성능 우수
   ○ 연산량이 동일하다면, ViT가 BiT보다 성능 우수
@@ -140,49 +132,39 @@
   ○ Large dataset(JFT)에서 ViT가 BiT보다 우수
   ○ Small dataset(ImageNet)에서 BiT가 ViT보다 우수
 
-이미지 인식
-  ○ ImageNet: 87.76%(ViT-L/16)(BiT-L 대비 +0.022%)
-  ○ VTAB(19 tasks): 77.63%(ViT-H/14)(BiT-L 대비 +1.34%)
-
-- 계산 효율성:
-  ○ 계산 크기가 동일하다면, ViT가 BiT보다 정확
-
-
 ## 5. 비판적 평가
 
 ### 5.1 강점
-- [논문의 주요 강점 개조식으로 작성]
-- [기술적 혁신 측면]
-  * [혁신 1과 설명]
-  * [혁신 2와 설명]
-- [성능 향상 측면]
-- [이론적 기여 측면]
-- CV(Computer Vison) 분야에서 Transformer 인코더 구조를 순전히 활용
-- CV 분야에서 attension 기법을 활용한 연구 중 가장 높은 resolution을 다룸
--
+- 아키텍쳐적 혁신: CNN 모델 탈피
+  ○ CV(Computer Vison) 분야에서 Transformer 인코더 구조를 순전히 활용(구조적 단순함)
+  ○ 초기 layer에서 locality와 globality 모두 학습
+  ○ 뒷 layer에서 globality 집중 학습
+  ○ CV 분야에서 attention 기법을 활용한 연구 중 가장 높은 resolution을 다룸
+
+- 성능 향상:
+  ○ Image classification 분야 SOTA 달성
+  ○ 기존 모델 대비 효율적 연산
+
+- 이론적 기여:
+  ○ 거거익선(거대한 모델과 거대한 데이터일수록 성능 우상향) 증명
 
 ### 5.2 한계점
-- [논문의 주요 한계점 개조식으로 작성]
-- [방법론적 한계]
-  * [한계 1과 설명]
-  * [한계 2와 설명]
-- [실험적 한계]
-- [가정 및 제약사항]
-- Dataset 크기 제한
+- 방법론적 한계
+  ○ Detection, Segmentation과 같은 다른 task에 대해 적용 불가(낮은 범용성)
+  ○ Self-supervised learning 활용 시, 기존 모델보다 낮은 성능
+
+- 실험적 한계
   ○ 작은 dataset에서 기존 모델이 더 좋은 성능을 보임
+  ○ High resolution 활용 pre-training 통계 부족
 
 ### 5.3 개선 가능성
-- [논문의 개선 가능성 개조식으로 작성]
-- [방법론 개선 방향]
-  * [개선 방향 1과 설명]
-  * [개선 방향 2와 설명]
-- [추가 실험 제안]
-- [새로운 응용 분야 제안]
 - 구조 개선:
-  ○ 작은 Dataset에서 indutive bias 의도적 활용(MSA의 QK^T 연산 시 이웃하는 patch에 +1.2배, 중간 지점 +1.0배, 멀리 떨어진 지점 +0.8배) 
+  ○ 작은 Dataset에서 inductive bias 의도적 활용(MSA의 QK^T 연산 시 이웃하는 patch에 +1.2배, 중간 지점 +1.0배, 멀리 떨어진 지점 +0.8배) 
   ○ Hardware 구조에 맞춰, 메모리 공간의 연속적인 Axial Multi-Head Attention 활용
+
 - Fine-Tuning 추가 실험:
-  ○ NLP(Natural Language Processing)에서 활용한 방법과 같이 output layer를 추가하여, 특정 task에 맞춰 fine-tuning
+  ○ NLP(Natural Language Processing)에서 활용한 방법과 같이 output layer를 추가하여, 더 많 task에 맞춰 fine-tuning 및 자세한 분
+
 - 새로운 응용:
   ○ Image generator: Transformer decoder를 추가하여, 이미지 생성
   ○ Text + Image 병렬 encoding: 특정 형상(강아지, 차량 모양의 사진)과 텍스트('강아지', '자동차') mapping 학습
@@ -193,26 +175,25 @@
 ## 6. 관련 연구와의 관계
 
 ### 6.1 선행 연구와의 연관성
-- [기반이 되는 선행 연구 개조식으로 작성]
-- [이론적 배경 및 영향]
-  * [영향 1과 설명]
-  * [영향 2와 설명]
-- [방법론적 연관성]
-- [동일 문제에 대한 다른 접근법들]
-- BERT
-- Parmar
-- weissenborn
-- cordonnier
---->이건 너무 많다 적어달라하자
+- 이론적 배경
+  ○ NLP의 Transformer encoder 구조 활용(Devlin et al. (2019))
+  ○ 2x2 small resolution에서 Vision Transformer 활용(Cordonnier et al. (2020))
+  ○ 픽셀 단위 self-attention(Parmar et al. (2018))
 
+- 방법론적 연관성
+  ○ Transformer의 encoder를 CV에서 Image classification을 목적으로 활용
+  ○ medium-resolution에서 Vision Transformer 활용 성공
+  ○ Patch 단위 self-attention 진행
+
+- 동일 문제에 대한 다른 접근법
+  ○ CNN 기반 모델(BiT) 활용 Image classification(Kolesnikov et al., 2020)
+  ○ CNN과 self-attention을 결합한 hybrid 모델(Wang et al. (2018))
 
 ### 6.2 차별점
-- [선행 연구와의 차별점 개조식으로 작성]
-- [새로운 기술적 접근법]
-  * [차별점 1과 설명]
-  * [차별점 2와 설명]
-- [성능 개선 측면의 차별점]
-- [문제 정의 및 해결 방식의 차이점]
+- 새로운 기술적 접근법
+  ○ 2D image를 1D로 span하여 Transformer의 input으로 사용
+  ○ Text가 아닌 Image 관점의 Transformer 사용
+  ○ Transformer encoder의 원래 구조 반영과 CNN 구조 배제(inductive bias 극복하며 성능 대폭 향상)
 
 ## 7. AIoT 연구에의 적용 가능성
 
@@ -241,16 +222,24 @@
 - [예상되는 결과 및 효과]
 
 ## 8. 참고 문헌
-
-- [논문 리뷰 작성 중 추가로 참고한 문헌들 나열]
-- [형식: 저자. (연도). 제목. 출처.]
+1. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. Advances in Neural Information Processing Systems (NeurIPS).
+2. Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. Proceedings of the NAACL-HLT.
+3. He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. Proceedings of the IEEE conference on computer vision and pattern recognition (CVPR).
+4. Kolesnikov, A., Beyer, L., Zhai, X., Puigcerver, J., Yung, J., Gelly, S., & Houlsby, N. (2020). Big Transfer (BiT): General Visual Representation Learning. European Conference on Computer Vision (ECCV).
+5. Cordonnier, J.-B., Loukas, A., & Jaggi, M. (2020). On the Relationship between Self-Attention and Convolutional Layers. International Conference on Learning Representations (ICLR).
+6. Parmar, N., Vaswani, A., Uszkoreit, J., Kaiser, L., Shazeer, N., Ku, A., & Tran, D. (2018). Image Transformer. International Conference on Machine Learning (ICML).
+7. Sun, C., Shrivastava, A., Singh, S., & Gupta, A. (2017). Revisiting unreasonable effectiveness of data in deep learning era. Proceedings of the IEEE international conference on computer vision (ICCV).
+8. Russakovsky, O., Deng, J., Su, H., Krause, J., Satheesh, S., Ma, S., ... & Fei-Fei, L. (2015). ImageNet Large Scale Visual Recognition Challenge. International Journal of Computer Vision (IJCV).
 
 ## 9. 용어 정리
-
-- **[약어 1]** ([원래 단어]: [간략한 정의])
-- **[약어 2]** ([원래 단어]: [간략한 정의])
-- **[용어 1]**: [정의 및 설명]
-- **[용어 2]**: [정의 및 설명]
+1. ViT(Vision Transformer): 이미지를 패치 단위로 분할하여 Transformer 인코더에 입력하는 방식의 이미지 인식 모델
+2. MSA(Multi-Head Self-Attention): 입력 시퀀스 내의 모든 요소(패치) 간의 관계를 여러 개의 헤드(Head)로 나누어 병렬적으로 계산하여 다양한 특징을 추출하는 메커니즘
+3. MLP(Multi-Layer Perceptron): 입력층과 출력층 사이에 하나 이상의 은닉층이 존재하는 신경망으로, ViT에서는 인코더 내부의 피드포워드 네트워크(FFN)를 지칭함
+4. BiT(Big Transfer): 대규모 데이터셋으로 사전 학습된 ResNet 기반의 CNN 모델로, 본 논문에서 ViT의 성능을 비교 검증하기 위한 베이스라인(Baseline)으로 사용됨
+5. Inductive Bias: 모델이 학습하지 않은 데이터에 대해 예측을 수행할 때 사용하는 추가적인 가정. (예: CNN은 지역성(Locality)과 평행이동 불변성(Translation Equivariance)이라는 강한 편향을 가짐)
+6. Patch Embedding: 2차원 이미지를 고정된 크기의 조각(Patch)으로 자르고, 이를 선형 변환(Linear Projection)하여 1차원 벡터 시퀀스로 만드는 과정
+7. [class] token: BERT에서 차용한 개념으로, 입력 시퀀스의 맨 앞에 추가되는 학습 가능한 특수 벡터. 인코더를 통과한 후 이 토큰의 출력값이 이미지 전체의 표현(Global Representation)으로 간주되어 분류에 사용
+8. Fine-tuning: 대규모 데이터셋으로 사전 학습(Pre-training)된 모델의 가중치를 초기값으로 사용하여, 해결하고자 하는 특정 작업(Downstream Task)의 데이터셋에 맞게 추가로 학습시키는 과정
 
 ## 10. 추가 참고 사항
 
@@ -294,8 +283,8 @@
 
 ---
 
-**작성자**: [이름]  
-**작성일**: YYYY-MM-DD  
+**작성자**: 임재현 
+**작성일**: 2025-02-03  
 **토론 사항**: 
 - [내용1]
 - [내용2]
