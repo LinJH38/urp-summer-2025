@@ -40,7 +40,7 @@
 
 ### 3.2 핵심 알고리즘/모델
 * 목적 함수(Value Function):
-  * 수식: min_{G}max_{D}V(D,G) = E_x~p_data(x)[log D(x)] + E_z~p_z(z)[log(1-D(G(z)))]
+  * 수식: min_{G}max_{D}V(D,G) = E_x-p_data(x)[log D(x)] + E_z-p_z(z)[log(1-D(G(z)))]
     * G: generator
     * D: discriminator
   * Global optimality를 계산함
