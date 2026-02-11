@@ -73,70 +73,110 @@
 ## 4. 주요 결과 분석
 
 ### 4.1 정량적 결과
-- [주요 성능 지표 및 결과 개조식으로 작성]
-- [표나 그래프에 나타난 수치 데이터 요약]
-  * [결과 1의 수치와 의미]
-  * [결과 2의 수치와 의미]
-- [기존 방법과의 비교 결과]
-- [통계적 유의성 분석 결과]
+* CIFAR-10 성능:
+  * FID: 3.17
+  * IS: 9.46
+* NLL vs Sample Quality:
+  * NLL(3.75 bits/dim)은 다른 Likelihood 기반 모델(Flow, VAE)보다 다소 높게 측정되었지만, 샘플 품질(FID)는 훨씬 뛰어남
+ * Ablation Study 결과:
+   * epsilon-prediction과 고정된 분산, L_simple 조합이 가장 우수한 성능을 보임
 
 ### 4.2 정성적 결과
-- [수치화되지 않은 결과 개조식으로 작성]
-- [사례 연구 및 관찰 결과]
-- [시각화 결과 분석]
-- [모델 행동 특성 및 패턴 분석]
-
+* Coarse-to-Fine 생성:
+  * t가 큰 초기 단계에서는 전체적인 구조(윤곽, 배치)가 형성됨
+  * t가 작아질수록 미세한 디테일(질감, 배경 잡음)이 채워지는 점진적 코딩 특성 확인
+* 보간(Interpolation):
+  * 원본 이미지 간의 잠재 공간 보간 시, 픽셀이 겹치는 것이 아니라 의미론적(Semantic) 특징(안경 유무, 포즈 등)이 자연스럽게 변하는 고품질 결과 확인
+  * 동일한 잠재 변수 x_T를 공유하되 x_0만 다르게 하여 생성 시, 일관된 고수준 특징(High-level structure) 유지 확인
+ 
 ### 4.3 비교 분석
-- [제안 방법과 기존 방법 간 비교 개조식으로 작성]
-- [성능 측면의 비교]
-  * [장점 1과 설명]
-  * [장점 2와 설명]
-- [효율성 측면의 비교]
-- [적용 범위 및 한계의 비교]
+* GAN:
+  * 장점: 학습 과정이 훨씬 안정적이며, Mode Collapse(특정 이미지만 생성하는 현상)가 발생하지 않음
+  * 단점: Sampling 속도가 느림 (1장의 이미지를 위해 1000번의 연산 필요)
+* VAE:
+  * 장점: 생성된 이미지의 선명도(Sharpness)와 품질이 월등히 높음
+  * 차이점: Latent Space의 차원이 데이터 차원과 동일함
+* DDPM은 spatial compression(공간 압축) 대신 lossy compression(손실 압축)을 진행함
+* 즉, GAN와 VAE가 공간 압축을 통해 원본 이미지의 semantic information을 얻는 것과 유사하게 매 시간 t마다 다른 semantic information을 복원함
 
 ## 5. 비판적 평가
 
 ### 5.1 강점
-- [논문의 주요 강점 개조식으로 작성]
-- [기술적 혁신 측면]
-  * [혁신 1과 설명]
-  * [혁신 2와 설명]
-- [성능 향상 측면]
-- [이론적 기여 측면]
+* 기술적 혁신 측면
+  * 노이즈 예측(epsilon-prediction) 파라미터화: 복잡한 평균(mu) 예측 대신, 현재 이미지에 더해진 노이즈를 예측하도록 목적 함수를 재구성하여 최적화 난이도 대폭 하락
+  * 단순화된 목적 함수(L_simple): 변분 하한(VLB)의 복잡한 가중치를 모두 1로 통일하여, 지각적으로 중요한 굵직한 특징(Large-scale features) 학습에 모델의 역량을 집중시킴
+* 성능 향상 측면
+  * Mode Collapse 원천 차단
+  * FID 3.17 달성
+* 이론적 기여 측면
+  * Diffusion Model과 Langevin Dynamics 사이 수학적 동치성 및 연결 고리 최초 규명 
 
 ### 5.2 한계점
-- [논문의 주요 한계점 개조식으로 작성]
-- [방법론적 한계]
-  * [한계 1과 설명]
-  * [한계 2와 설명]
-- [실험적 한계]
-- [가정 및 제약사항]
+* 방법론적 한계
+  * 계산 복잡도: 1장의 이미지를 생성하기 위해, latent space에서 원본 데이터와 동일한 차원의 연산을 1,000회 수행해야 함
+* 실험적 한계
+  * NLL 수치가 다른 Likelihood 기반 모델에 비해 열등
+* 가정 및 제약사항
+  * Forward Process의 beta가 constant로 scheduling됨
+  * x_T의 분포를 Normal Distribution으로 제한  
 
 ### 5.3 개선 가능성
-- [논문의 개선 가능성 개조식으로 작성]
-- [방법론 개선 방향]
-  * [개선 방향 1과 설명]
-  * [개선 방향 2와 설명]
-- [추가 실험 제안]
-- [새로운 응용 분야 제안]
+* Beta를 각 데이터 특성에 맞게 학습 시킬 수 있도록 성능 개선
 
 ## 6. 관련 연구와의 관계
 
 ### 6.1 선행 연구와의 연관성
-- [기반이 되는 선행 연구 개조식으로 작성]
-- [이론적 배경 및 영향]
-  * [영향 1과 설명]
-  * [영향 2와 설명]
-- [방법론적 연관성]
-- [동일 문제에 대한 다른 접근법들]
+* 이론적 배경 및 영향
+  * Sohl-Dickstein et al. (2015): 비평형 열역학을 머신러닝에 도입한 최초의 Diffusion Model 개념 차용
+  * Song & Ermon (2019): 노이즈 조건부 점수 네트워크(NCSN)와 Langevin Dynamics 연산을 역방향 과정의 수학적 토대로 연결
+* 방법론적 연관
+  * VAE (Variational Autoencoder): 변분 추론(Variational Inference)과 ELBO 식별 등 수학적 유도 과정과 Reparameterization Trick 공유
+* 동일 문제에 대한 다른 접근법들 * 차이점: Latent Space의 차원이 데이터 차원과 동일함
+* DDPM은 spatial compression(공간 압축) 대신 lossy compression(손실 압축)을 진행함
+* 즉, GAN와 VAE가 공간 압축을 통해 원본 이미지의 semantic information을 얻는 것과 유사하게 매 시간 t마다 다른 semantic information을 복원함
+
+## 5. 비판적 평가
+
+### 5.1 강점
+* 기술적 혁신 측면
+  * 노이즈 예측(epsilon-prediction) 파라미터화: 복잡한 평균(mu) 예측 대신, 현재 이미지에 더해진 노이즈를 예측하도록 목적 함수를 재구성하여 최적화 난이도 대폭 하락
+  * 단순화된 목적 함수(L_simple): 변분 하한(VLB)의 복잡한 가중치를 모두 1로 통일하여, 지각적으로 중요한 굵직한 특징(Large-scale features) 학습에 모델의 역량을 집중시킴
+* 성능 향상 측면
+  * Mode Collapse 원천 차단
+  * FID 3.17 달성
+* 이론적 기여 측면
+  * Diffusion Model과 Langevin Dynamics 사이 수학적 동치성 및 연결 고리 최초 규명 
+
+### 5.2 한계점
+* 방법론적 한계
+  * 계산 복잡도: 1장의 이미지를 생성하기 위해, latent space에서 원본 데이터와 동일한 차원의 연산을 1,000회 수행해야 함
+* 실험적 한계
+  * NLL 수치가 다른 Likelihood 기반 모델에 비해 열등
+* 가정 및 제약사항
+  * Forward Process의 beta가 constant로 scheduling됨
+  * x_T의 분포를 Normal Distribution으로 제한  
+
+### 5.3 개선 가능성
+* Beta를 각 데이터 특성에 맞게 학습 시킬 수 있도록 성능 개선
+
+## 6. 관련 연구와의 관계
+
+### 6.1 선행 연구와의 연관성
+* 이론적 배경 및 영향
+  * Sohl-Dickstein et al. (2015): 비평형 열역학을 머신러닝에 도입한 최초의 Diffusion Model 개념 차용
+  * Song & Ermon (2019): 노이즈 조건부 점수 네트워크(NCSN)와 Langevin Dynamics 연산을 역방향 과정의 수학적 토대로 연결
+* 방법론적 연관
+  * VAE (Variational Autoencoder): 변분 추론(Variational Inference)과 ELBO 식별 등 수학적 유도 과정과 Reparameterization Trick 공유
+* 동일 문제에 대한 다른 접근법들
+  * GAN: Generative adversarial net을 활용하여 이미지를 생성
 
 ### 6.2 차별점
-- [선행 연구와의 차별점 개조식으로 작성]
-- [새로운 기술적 접근법]
-  * [차별점 1과 설명]
-  * [차별점 2와 설명]
-- [성능 개선 측면의 차별점]
-- [문제 정의 및 해결 방식의 차이점]
+* 새로운 기술적 접근법
+  * 차원 유지(No Bottleneck): VAE처럼 정보를 저차원 벡터로 압축하지 않고, 원본 차원을 유지하며 시간축(T)을 활용하여 노이즈로 정보를 지우고 복원함
+* 성능 개선 측면의 차별점
+  * GAN과 달리 정확한 수학적 확률 밀도(Likelihood)에 기반하면서도, 기존 Likelihood 모델들의 한계였던 흐릿한 화질(Blurry) 현상을 극복하고 선명도(Sharpness) 확보
+* 문제 정의 및 해결 방식의 차이점
+  * 복잡한 확률 분포 매핑 문제를 가우시안 노이즈를 더하고 빼는 수많은 단순한 스텝(Denoising)의 연속으로 쪼개어 해결함 (점진적 손실 압축기 형태) 
 
 ## 7. AIoT 연구에의 적용 가능성
 
@@ -166,19 +206,25 @@
 
 ## 8. 참고 문헌
 
-- [논문 리뷰 작성 중 추가로 참고한 문헌들 나열]
-- [형식: 저자. (연도). 제목. 출처.]
+1. Sohl-Dickstein, J., Weiss, E., Maheswaranathan, N., & Ganguli, S. (2015). Deep unsupervised learning using nonequilibrium thermodynamics. International Conference on Machine Learning, 2256-2265
+2. Song, Y., & Ermon, S. (2019). Generative modeling by estimating gradients of the data distribution. Advances in Neural Information Processing Systems, 32
+3. Kingma, D. P., & Welling, M. (2013). Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114
+4. Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., ... & Bengio, Y. (2014). Generative adversarial nets. Advances in neural information processing systems, 27
 
 ## 9. 용어 정리
 
-- **[약어 1]** ([원래 단어]: [간략한 정의])
-- **[약어 2]** ([원래 단어]: [간략한 정의])
-- **[용어 1]**: [정의 및 설명]
-- **[용어 2]**: [정의 및 설명]
+1. DDPM (Denoising Diffusion Probabilistic Models: 잡음 제거 확산 확률 모델): 열역학의 확산 원리에서 영감을 받아, 데이터에 노이즈를 주입하는 과정과 이를 다시 제거하는 과정을 학습하여 새로운 데이터를 생성하는 확률적 생성 모델.
+2. NLL (Negative Log-Likelihood: 음의 로그 우도): 모델이 실제 데이터의 분포를 얼마나 잘 모사하는지 측정하는 지표. 값이 낮을수록 모델이 원본 데이터를 높은 확률로 설명할 수 있음을 의미
+3. FID (Fréchet Inception Distance): 생성 모델의 이미지 품질과 다양성을 평가하는 정량적 지표. 실제 데이터 분포와 생성된 데이터 분포 간의 거리를 Inception 네트워크의 특징(Feature) 공간에서 계산하며, 낮을수록 원본과 유사함을 의미
+4. VLB / ELBO (Variational Lower Bound / Evidence Lower Bound: 변분 하한): 다루기 힘든 복잡한 확률 분포의 우도(Likelihood)를 직접 최대화하는 대신, 수학적으로 계산 가능한 우도의 하한선을 정의하여 이를 최대화(또는 음수를 취해 최소화)하도록 돕는 목적 함수
+5. Reparameterization Trick (재매개변수화 기법): 확률적 샘플링 과정(예: z ~ N(mu, sigma^2))을 결정론적 함수(mu + sigma*epsilon)와 순수 노이즈(epsilon ~ N(0, I))의 결합으로 분리하여, 신경망 학습 시 역전파(Backpropagation) 연산이 가능하도록 만드는 수학적 기법
+6. Langevin Dynamics (랑주뱅 동역학): 본래 분자 시스템의 무작위 움직임을 묘사하는 물리학 방정식. 생성 모델에서는 데이터 분포의 점수(Score, 기울기)와 가우시안 노이즈를 결합하여, 무작위 공간에서 확률 밀도가 높은 데이터 영역으로 점진적으로 이동하며 샘플링하는 수학적 기법으로 응용
+7. Mode Collapse (모드 붕괴): GAN 등의 생성 모델에서 발생하는 고질적인 문제로, 모델이 데이터의 다양한 분포(다양한 형태의 이미지)를 학습하지 못하고, 판별자를 속이기 쉬운 특정 몇 가지 제한된 패턴의 결과물만 반복적으로 생성하는 현상
+8. Lossy Compression (손실 압축): 사람이 인지하기 어려운 미세한 정보(High-frequency details)는 손실시키더라도, 전체적인 형체나 맥락 등 지각적으로 중요한 굵직한 특징(Large-scale features) 위주로 데이터를 압축하여 저장하고 복원하는 방식. DDPM이 작동하는 핵심 귀납적 편향(Inductive Bias)으로 해석됨
 
 ## 10. 추가 참고 사항
 
-- [논문 관련 코드 저장소]
+- [논문 관련 코드 저장소]: [CODE](https://github.com/LinJH38/PyTorch/tree/main/diffusion)
 - [추가 자료 및 리소스]
 - [관련 토론 및 후속 연구]
 - [구현 시 참고할 사항]
@@ -218,8 +264,8 @@
 
 ---
 
-**작성자**: [이름]  
-**작성일**: YYYY-MM-DD  
+**작성자**: 임재현
+**작성일**: 2026-02-11  
 **토론 사항**: 
 - [내용1]
 - [내용2]
