@@ -224,7 +224,7 @@
 
 ## 10. 추가 참고 사항
 
-- [논문 관련 코드 저장소]: [CODE](https://github.com/LinJH38/PyTorch/tree/main/diffusion)
+- 논문 관련 코드 저장소: [CODE](https://github.com/LinJH38/PyTorch/tree/main/diffusion)
 - [추가 자료 및 리소스]
 - [관련 토론 및 후속 연구]
 - [구현 시 참고할 사항]
