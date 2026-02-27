@@ -11,7 +11,7 @@
 ## 2. I/Q 신호와 고주파 신호의 이해 (Signal Characteristics)
 * 안테나를 통해 수신되는 고주파(High-frequency) 통신 신호를 처리의 편의성을 위해 기저대역(Baseband)으로 Down-conversion
 * 이 과정에서 신호는 동상(In-phase, $I$) 성분과 직교(Quadrature, $Q$) 성분으로 나뉘어 복소수 형태의 이산 시간 신호(Discrete-time signal)로 표현:
-  $s[t] = I(t)cos(2pi*f_c*t) - Q(t)sin(2pi*f_c*t)$ -> $x[t] = I[t] + jQ[t]$ f_c(반송파 주파수) 제거
+  $s[t] = I(t)\cos(2\pi f_c t) - Q(t)\sin(2\pi f_c t)$ -> $x[t] = I[t] + jQ[t]$ f_c(반송파 주파수) 제거
 * CNN과 LSTM은 이 두 채널의 위상 변화(Phase Shift)와 진폭 패턴을 학습하여 변조 방식을 역추적
 
 ## 3. 노이즈 환경과 SNR (Signal-to-Noise Ratio)
