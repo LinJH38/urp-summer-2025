@@ -1,0 +1,19 @@
+# PyTorch Deep Learning Framework
+torch>=2.0.0
+torchaudio>=2.0.0
+torchvision>=0.15.0
+
+# Data Manipulation & Math
+numpy>=1.23.0
+pandas>=1.5.0
+
+# Visualization
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# Jupyter Environment
+jupyter>=1.0.0
+notebook>=6.5.0
+
+# Machine Learning Metrics (Confusion Matrix 등 평가용)
+scikit-learn>=1.1.0
